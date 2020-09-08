@@ -11,10 +11,10 @@ public class NumberPrinter {
         this.rowsPerPage = rowsPerPage;
     }
 
-    void print(int[] numbers) {
+    void print(int[] numbers, String title) {
         initialize(numbers);
         while (needToPrintMore()) {
-            printHeader();
+            printHeader(title);
             printNumbersOnPage();
             moveToNextPage();
         }
@@ -47,12 +47,8 @@ public class NumberPrinter {
             System.out.printf("%10d", this.numbers[index]);
     }
 
-    private void printHeader() {
-        System.out.print("The First ");
-        System.out.print(Integer.toString(getNumberOfNumbers()));
-        System.out.print(" Prime Numbers --- Page ");
-        System.out.print(Integer.toString(pageNumber));
-        System.out.println("\n");
+    private void printHeader(String title) {
+        System.out.printf("%s--- Page %d\n%n", title, pageNumber);
     }
 
     public int getPageOffset() {
