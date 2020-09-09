@@ -1,31 +1,39 @@
 package literateProgramming;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 class PrimeGenerator {
+    private final ArrayList<Integer> oddPrimes = new ArrayList<>();
     private int numPrimes;
-    private int candidatePrime = 1;
-    private int lastPrimeIndex = 1;
-    private int[] primes;
+    private int candidatePrime = 3;
     private ArrayList<Multiple> multiples = new ArrayList<Multiple>();
 
     public PrimeGenerator(int numPrimes) {
         this.numPrimes = numPrimes;
-        primes = new int[numPrimes + 1];
-        primes[1] = 2;
+        oddPrimes.add(3);
     }
 
     public int[] generate() {
         while (needMorePrimes()) storeNextPrime(computeNextPrime());
+        return getPrimesArray();
+    }
+
+    private int[] getPrimesArray() {
+        int[] primes = new int[oddPrimes.size() + 2];
+        primes[1] = 2;
+        for (int i = 0; i < oddPrimes.size(); i++) {
+            primes[i + 2] = oddPrimes.get(i);
+        }
         return primes;
     }
 
     private boolean needMorePrimes() {
-        return lastPrimeIndex < numPrimes;
+        return oddPrimes.size() + 1 < numPrimes;
     }
 
     private void storeNextPrime(int nextPrime) {
-        primes[++lastPrimeIndex] = nextPrime;;
+        oddPrimes.add(nextPrime);
     }
 
     private int computeNextPrime() {
@@ -45,7 +53,7 @@ class PrimeGenerator {
     }
 
     private int nextPrimeFactor() {
-        return primes[multiples.size() + 2];
+        return oddPrimes.get(multiples.size());
     }
 
     private boolean candidateIsComposite() {
