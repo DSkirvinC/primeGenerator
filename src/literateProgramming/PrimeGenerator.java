@@ -16,40 +16,44 @@ class PrimeGenerator {
     }
 
     public int[] generate() {
-        while (needMorePrimes()) computeAndStoreNextPrime();
+        while (needMorePrimes()) storeNextPrime(computeNextPrime());
         return primes;
     }
 
-    private void computeAndStoreNextPrime() {
+    private boolean needMorePrimes() {
+        return lastPrimeIndex < numPrimes;
+    }
+
+    private void storeNextPrime(int nextPrime) {
+        primes[++lastPrimeIndex] = nextPrime;;
+    }
+
+    private int computeNextPrime() {
         do {
             candidatePrime += 2;
             addNextMultipleEntryIfReachedNextPrimeSquare();
-            updateMultiplesToReachCandidate();
         } while (candidateIsComposite());
-        lastPrimeIndex++;
-        primes[lastPrimeIndex] = candidatePrime;
-    }
-
-    private boolean candidateIsComposite() {
-        for (int n = 2 ; n < ord; n++) {
-            if (multiples[n] == candidatePrime)
-                return true;
-        }
-        return false;
-    }
-
-    private void updateMultiplesToReachCandidate() {
-        for (int n = 2 ; n < ord; n++){
-            while (multiples[n] < candidatePrime)
-                multiples[n] += primes[n] + primes[n];
-        }
+        return candidatePrime;
     }
 
     private void addNextMultipleEntryIfReachedNextPrimeSquare() {
         if (candidatePrime == primes[ord] * primes[ord]) multiples[ord++] = candidatePrime;
     }
 
-    private boolean needMorePrimes() {
-        return lastPrimeIndex < numPrimes;
+    private boolean candidateIsComposite() {
+        for (int n = 2 ; n < ord; n++) {
+            if (candidateIsNthMultiple(n)) return true;
+        }
+        return false;
+    }
+
+    private boolean candidateIsNthMultiple(int n) {
+        updateNthMultiple(n);
+        return multiples[n] == candidatePrime;
+    }
+
+    private void updateNthMultiple(int n) {
+        while (multiples[n] < candidatePrime)
+            multiples[n] += primes[n] + primes[n];
     }
 }
