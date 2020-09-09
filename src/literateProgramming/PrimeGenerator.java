@@ -7,7 +7,7 @@ class PrimeGenerator {
     private int candidatePrime = 1;
     private int lastPrimeIndex = 1;
     private int[] primes;
-    private ArrayList<Integer> multiples = new ArrayList<>();
+    private ArrayList<Multiple> multiples = new ArrayList<Multiple>();
 
     public PrimeGenerator(int numPrimes) {
         this.numPrimes = numPrimes;
@@ -31,46 +31,47 @@ class PrimeGenerator {
     private int computeNextPrime() {
         do {
             candidatePrime += 2;
-            addNextMultipleEntryIfReachedNextPrimeSquare();
+            maybeAddNextMultiple(nextPrimeFactor());
         } while (candidateIsComposite());
         return candidatePrime;
     }
 
-    private void addNextMultipleEntryIfReachedNextPrimeSquare() {
-        if (candidatePrime == primes[getOrd()] * primes[getOrd()]) addNewMultiple(candidatePrime);
+    private void maybeAddNextMultiple(int prime) {
+        if (candidatePrime == prime * prime) addNewMultiple();
     }
 
-    private void addNewMultiple(int candidatePrime) {
-        multiples.add(candidatePrime);
+    private void addNewMultiple() {
+        multiples.add(new Multiple(nextPrimeFactor()));
+    }
+
+    private int nextPrimeFactor() {
+        return primes[multiples.size() + 2];
     }
 
     private boolean candidateIsComposite() {
-        for (int n = 2; n < getOrd(); n++) {
-            if (candidateIsNthMultiple(n)) return true;
+        for (Multiple multiple : multiples) {
+            if (multiple.becomes(candidatePrime)) return true;
         }
         return false;
     }
 
-    private boolean candidateIsNthMultiple(int n) {
-        updateNthMultiple(n);
-        return getNthMultiple(n) == candidatePrime;
-    }
+    private class Multiple {
+        private final int prime;
+        private int value;
 
-    private int getNthMultiple(int n) {
-        return multiples.get(n -2);
-    }
+        public Multiple(int prime) {
+            this.prime = prime;
+            value = prime * prime;
+        }
 
-    private void updateNthMultiple(int n) {
-        while (getNthMultiple(n) < candidatePrime)
-            increaseNthMultipleBy(n, primes[n] + primes[n]);
-    }
+        private boolean becomes(int number) {
+            updateToReach(number);
+            return value == number;
+        }
 
-    private void increaseNthMultipleBy(int n, int amount) {
-        int index = n - 2;
-        multiples.set(index, multiples.get(index) + amount);
-    }
-
-    public int getOrd() {
-        return multiples.size() + 2;
+        private void updateToReach(int number) {
+            while (value < number)
+                value += prime + prime;
+        }
     }
 }
