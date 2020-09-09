@@ -2,43 +2,54 @@ package literateProgramming;
 
 class PrimeGenerator {
     private int numPrimes;
+    private int candidatePrime = 1;
+    private int lastPrimeIndex = 1;
+    private int[] primes;
+    private int ord = 2;
+    private int ordmax = 30;
+    private int[] multiples = new int[ordmax + 1];
 
     public PrimeGenerator(int numPrimes) {
         this.numPrimes = numPrimes;
+        primes = new int[numPrimes + 1];
+        primes[1] = 2;
     }
 
     public int[] generate() {
-        int N = 0;
-        int candidatePrime = 1;
-        int lastPrimeIndex = 1;
-        int[] primes = new int[numPrimes + 1];
-        primes[1] = 2;
-        int ORD = 2;
-        int nextPrimeSquare = 9;
-        final int ORDMAX = 30;
-        int[] multiples = new int[ORDMAX + 1];
-        while (lastPrimeIndex < numPrimes) {
-            boolean possiblyPrime;
-            do {
-                candidatePrime += 2;
-                if (candidatePrime == nextPrimeSquare) {
-                    ORD++;
-                    nextPrimeSquare = primes[ORD] * primes[ORD];
-                    multiples[ORD - 1] = candidatePrime;
-                }
-                N = 2;
-                possiblyPrime = true;
-                while (N < ORD && possiblyPrime) {
-                    while (multiples[N] < candidatePrime)
-                        multiples[N] += primes[N] + primes[N];
-                    if (multiples[N] == candidatePrime)
-                        possiblyPrime = false;
-                    N++;
-                }
-            } while (!possiblyPrime);
-            lastPrimeIndex++;
-            primes[lastPrimeIndex] = candidatePrime;
-        }
+        while (needMorePrimes()) computeAndStoreNextPrime();
         return primes;
+    }
+
+    private void computeAndStoreNextPrime() {
+        do {
+            candidatePrime += 2;
+            addNextMultipleEntryIfReachedNextPrimeSquare();
+            updateMultiplesToReachCandidate();
+        } while (candidateIsComposite());
+        lastPrimeIndex++;
+        primes[lastPrimeIndex] = candidatePrime;
+    }
+
+    private boolean candidateIsComposite() {
+        for (int n = 2 ; n < ord; n++) {
+            if (multiples[n] == candidatePrime)
+                return true;
+        }
+        return false;
+    }
+
+    private void updateMultiplesToReachCandidate() {
+        for (int n = 2 ; n < ord; n++){
+            while (multiples[n] < candidatePrime)
+                multiples[n] += primes[n] + primes[n];
+        }
+    }
+
+    private void addNextMultipleEntryIfReachedNextPrimeSquare() {
+        if (candidatePrime == primes[ord] * primes[ord]) multiples[ord++] = candidatePrime;
+    }
+
+    private boolean needMorePrimes() {
+        return lastPrimeIndex < numPrimes;
     }
 }
